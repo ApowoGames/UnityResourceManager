@@ -4,4 +4,10 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Reference Include="UnityEngine">
+        <HintPath>..\..\..\..\..\..\..\Applications\UnityEditors\2021.3.1f1c1\Unity.app\Contents\Managed\UnityEngine.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

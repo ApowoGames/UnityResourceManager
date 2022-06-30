@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace ApowoGames.Resources
 {
@@ -34,6 +35,8 @@ namespace ApowoGames.Resources
             {
                 // load from network
             }
+
+            _started = false;
         }
 
         private bool CheckInCache()

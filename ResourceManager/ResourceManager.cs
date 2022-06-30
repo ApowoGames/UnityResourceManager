@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using ApowoGames.Resources.External;
+using UnityEngine;
 
 namespace ApowoGames.Resources
 {
@@ -8,22 +9,29 @@ namespace ApowoGames.Resources
     {
         private static Dictionary<string, Loader> _loaders = new Dictionary<string, Loader>();
 
-        public static async Task<T> Load<T>(Request request) where T : TargetBase
+        public static async Task<Response[]> Load(Request request)
         {
-            if (request.Uris.Length != request.MimeTypes.Length)
-            {
-                return null;
-            }
             var tasks = new List<Task<Response>>();
-            for (int i = 0; i < request.Uris.Length; i++)
+            for (int i = 0; i < request.UriAndMimeTypes.Length; i++)
             {
-                var uri = request.Uris[i];
-                var mimeType = request.MimeTypes[i];
-                tasks.Add(PerLoad(uri, mimeType, request.CachePolicy, request.UnloadPolicy));
+                var uriAndMimeType = request.UriAndMimeTypes[i];
+                tasks.Add(PerLoad(uriAndMimeType.Uri, uriAndMimeType.MimeType, request.CachePolicy, request.UnloadPolicy));
             }
             
             var responses = await Task.WhenAll(tasks);
-            return new T(responses);
+            return responses;
+        }
+
+        public static async Task<SpriteSheetTarget> Load<SpriteSheetTarget>(SpriteSheetRequest request)
+        {
+            var responses = await Load(request);
+            return new SpriteSheetTarget(responses);
+        }
+        
+        public static async Task<ImageTarget> Load<ImageTarget>(ImageRequest request)
+        {
+            var responses = await Load(request);
+            return new ImageTarget(responses);
         }
 
         private static async Task<Response> PerLoad(string uri, MimeType mimeType, CachePolicy cachePolicy, UnloadPolicy unloadPolicy)
@@ -39,9 +47,9 @@ namespace ApowoGames.Resources
         }
     }
 
-    public abstract class TargetBase
+    public class Target
     {
-        public TargetBase(Response[] responses)
+        public Target(Response[] responses)
         {
             
         }
@@ -49,10 +57,15 @@ namespace ApowoGames.Resources
 
     public class Request
     {
-        public string[] Uris { get; set; }
-        public MimeType[] MimeTypes { get; set; }
+        public UriAndMimeType[] UriAndMimeTypes { get; set; }
         public CachePolicy CachePolicy { get; set; }
         public UnloadPolicy UnloadPolicy { get; set; }
+    }
+    
+    public class UriAndMimeType
+    {
+        public string Uri { get; set; }
+        public MimeType MimeType { get; set; }
     }
 
     public abstract class Response
