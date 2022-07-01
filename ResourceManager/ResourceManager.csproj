@@ -5,6 +5,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Reference Include="UnityEditor">
+        <HintPath>..\..\..\..\..\..\..\Applications\UnityEditors\2021.3.1f1c1\Unity.app\Contents\Managed\UnityEditor.dll</HintPath>
+      </Reference>
       <Reference Include="UnityEngine">
         <HintPath>..\..\..\..\..\..\..\Applications\UnityEditors\2021.3.1f1c1\Unity.app\Contents\Managed\UnityEngine.dll</HintPath>
       </Reference>

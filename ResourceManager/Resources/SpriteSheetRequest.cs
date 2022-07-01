@@ -58,5 +58,10 @@ namespace ApowoGames.Resources
             CachePolicy = CachePolicy.永远;
             UnloadPolicy = UnloadPolicy.从不;
         }
+
+        public override Resource GenerateResource(ResponseFile[] responses)
+        {
+            return new SpriteSheetResource(responses);
+        }
     }
 }

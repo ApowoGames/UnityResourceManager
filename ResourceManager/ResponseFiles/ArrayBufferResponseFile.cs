@@ -1,6 +1,6 @@
 namespace ApowoGames.Resources
 {
-    public class ArrayBufferResponse : Response
+    public class ArrayBufferResponseFile : ResponseFile
     {
         public override MimeType MimeType => MimeType.ArrayBuffer;
 
@@ -8,9 +8,14 @@ namespace ApowoGames.Resources
         
         private byte[] _data;
 
-        public ArrayBufferResponse(byte[] data)
+        public ArrayBufferResponseFile(byte[] data)
         {
             _data = data;
+        }
+
+        public override void Dispose()
+        {
+            _data = null;
         }
     }
 }

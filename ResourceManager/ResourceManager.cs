@@ -6,35 +6,33 @@ using UnityEngine;
 namespace ApowoGames.Resources
 {
     public static class ResourceManager
-    {
+    {   
         private static Dictionary<string, Loader> _loaders = new Dictionary<string, Loader>();
 
-        public static async Task<Response[]> Load(Request request)
+        #region Load
+
+        // example:
+        // SpriteSheetResource ss = await ResourceManager.Load(SpriteSheetResource.BuildRequest(uri)) as SpriteSheetResource;
+        public static async Task<Resource> Load(Request request)
         {
-            var tasks = new List<Task<Response>>();
+            var responses = await LoadFiles(request);
+            return request.GenerateResource(responses);
+        }
+        
+        private static async Task<ResponseFile[]> LoadFiles(Request request)
+        {
+            var tasks = new List<Task<ResponseFile>>();
             for (int i = 0; i < request.UriAndMimeTypes.Length; i++)
             {
                 var uriAndMimeType = request.UriAndMimeTypes[i];
-                tasks.Add(PerLoad(uriAndMimeType.Uri, uriAndMimeType.MimeType, request.CachePolicy, request.UnloadPolicy));
+                tasks.Add(PerLoadFile(uriAndMimeType.Uri, uriAndMimeType.MimeType, request.CachePolicy, request.UnloadPolicy));
             }
-            
+
             var responses = await Task.WhenAll(tasks);
             return responses;
         }
 
-        public static async Task<SpriteSheetTarget> Load<SpriteSheetTarget>(SpriteSheetRequest request)
-        {
-            var responses = await Load(request);
-            return new SpriteSheetTarget(responses);
-        }
-        
-        public static async Task<ImageTarget> Load<ImageTarget>(ImageRequest request)
-        {
-            var responses = await Load(request);
-            return new ImageTarget(responses);
-        }
-
-        private static async Task<Response> PerLoad(string uri, MimeType mimeType, CachePolicy cachePolicy, UnloadPolicy unloadPolicy)
+        private static async Task<ResponseFile> PerLoadFile(string uri, MimeType mimeType, CachePolicy cachePolicy, UnloadPolicy unloadPolicy)
         {
             if (!_loaders.ContainsKey(uri))
             {
@@ -42,24 +40,45 @@ namespace ApowoGames.Resources
                 _loaders[uri] = loader;
             }
 
-            var response = await _loaders[uri].Load();
-            return response;
+            await _loaders[uri].Load();
+            return _loaders[uri].ResponseFile;
         }
-    }
 
-    public class Target
-    {
-        public Target(Response[] responses)
+        #endregion
+
+        #region Unload
+
+        public static void UnloadManually(Resource resource)
         {
-            
+            foreach (var responseFile in resource.Responses)
+            {
+                if (_loaders.ContainsKey(responseFile.Uri))
+                {
+                    _loaders[responseFile.Uri].Unload();
+                }
+            }
+        }
+
+        #endregion
+    }
+
+    public abstract class Resource
+    {
+        public ResponseFile[] Responses;
+        
+        protected Resource(ResponseFile[] responseFiles)
+        {
+            Responses = responseFiles;
         }
     }
 
-    public class Request
+    public abstract class Request
     {
         public UriAndMimeType[] UriAndMimeTypes { get; set; }
         public CachePolicy CachePolicy { get; set; }
         public UnloadPolicy UnloadPolicy { get; set; }
+        
+        public abstract Resource GenerateResource(ResponseFile[] responses);
     }
     
     public class UriAndMimeType
@@ -68,12 +87,13 @@ namespace ApowoGames.Resources
         public MimeType MimeType { get; set; }
     }
 
-    public abstract class Response
+    public abstract class ResponseFile
     {
         public object Data { get; }
         public string Uri { get; private set; }
         public abstract MimeType MimeType { get; }
         public string Suffix { get; private set; }
+        public abstract void Dispose();
     }
     
     public class MimeType : StringEnum

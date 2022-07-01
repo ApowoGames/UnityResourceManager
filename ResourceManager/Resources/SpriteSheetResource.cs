@@ -5,32 +5,37 @@ using UnityEngine;
 
 namespace ApowoGames.Resources
 {
-    public class SpriteSheetTarget : Target
+    public class SpriteSheetResource : Resource
     {
         public Dictionary<string, Sprite> Sprites;
         public Texture2D Texture2D;
-        
-        public SpriteSheetTarget(Response[] responses) : base(responses)
+
+        public static SpriteSheetRequest BuildRequest(string uri)
         {
-            ImageResponse imageResponse = null;
-            JsonResponse jsonResponse = null;
+            return new SpriteSheetRequest(uri);
+        }
+        
+        public SpriteSheetResource(ResponseFile[] responses) : base(responses)
+        {
+            ImageResponseFile imageResponseFile = null;
+            JsonResponseFile jsonResponseFile = null;
             foreach (var response in responses)
             {
                 if (response.MimeType == MimeType.Image)
                 {
-                    imageResponse = response as ImageResponse;
+                    imageResponseFile = response as ImageResponseFile;
                 }
 
                 if (response.MimeType == MimeType.Json)
                 {
-                    jsonResponse = response as JsonResponse;
+                    jsonResponseFile = response as JsonResponseFile;
                 }
             }
             
-            if (imageResponse?.Data == null || jsonResponse?.Data == null) return;
+            if (imageResponseFile?.Data == null || jsonResponseFile?.Data == null) return;
 
-            Texture2D = imageResponse.Data;
-            var jsonStr = jsonResponse.Data;
+            Texture2D = imageResponseFile.Data;
+            var jsonStr = jsonResponseFile.Data;
             var texWidth = Texture2D.width;
             var texHeight = Texture2D.height;
             var jsonResult = SpriteSheetJson.CreateFromJson(jsonStr);
