@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceManager", "ResourceManager\ResourceManager.csproj", "{0958B4A1-1138-4B6D-9FBE-4D9EC854645C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.apowo.games.remote.resources", "com.apowo.games.remote.resources\com.apowo.games.remote.resources.csproj", "{0958B4A1-1138-4B6D-9FBE-4D9EC854645C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

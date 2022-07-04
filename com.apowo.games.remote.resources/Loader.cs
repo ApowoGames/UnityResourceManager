@@ -216,7 +216,7 @@ namespace ApowoGames.Resources
                 Debug.LogError("MimeType error, check url: " + (Uri));
             }
 
-            if (data.Length > 0)
+            if (data.Length > 0 && CachePolicy == CachePolicy.永远)
             {
                 // save to cache
                 var cachePath = Path.Combine(CacheRoot, CacheFileName);

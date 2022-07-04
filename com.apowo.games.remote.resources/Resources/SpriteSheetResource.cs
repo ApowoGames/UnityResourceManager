@@ -65,9 +65,9 @@ namespace ApowoGames.Resources
     }
     
     [Serializable]
-    public class SpriteSheetJson
+    internal class SpriteSheetJson
     {
-        public SpriteSheetFrame[] frames;
+        internal SpriteSheetFrame[] frames;
 
         public static SpriteSheetJson CreateFromJson(string jsonString)
         {
@@ -101,13 +101,13 @@ namespace ApowoGames.Resources
     }
 
     [Serializable]
-    public class SpriteSheetFrame
+    internal class SpriteSheetFrame
     {
         public string filename;
         public SpriteSheetFrameRect frame;
     }
     [Serializable]
-    public class SpriteSheetFrameRect
+    internal class SpriteSheetFrameRect
     {
         public int x;
         public int y;

@@ -5,14 +5,14 @@ using UnityEngine;
 
 namespace ApowoGames.Resources
 {
-    public static class ResourceManager
+    public static class RemoteResourceManager
     {   
         private static Dictionary<string, Loader> _loaders = new Dictionary<string, Loader>();
 
         #region Load
 
         // example:
-        // SpriteSheetResource ss = await ResourceManager.Load(SpriteSheetResource.BuildRequest(uri)) as SpriteSheetResource;
+        // SpriteSheetResource ss = await com.apowo.games.remote.resources.Load(SpriteSheetResource.BuildRequest(uri)) as SpriteSheetResource;
         public static async Task<Resource> Load(Request request)
         {
             var responses = await LoadFiles(request);
