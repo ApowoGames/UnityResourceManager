@@ -13,6 +13,10 @@ namespace ApowoGames.Resources
         {
             return new SpriteSheetRequest(uri);
         }
+        public static SpriteSheetRequest BuildRequest(string imgUri, string jsonUri)
+        {
+            return new SpriteSheetRequest(imgUri, jsonUri);
+        }
         
         public SpriteSheetResource(ResponseFile[] responses) : base(responses)
         {

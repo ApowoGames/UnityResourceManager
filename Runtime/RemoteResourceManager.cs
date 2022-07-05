@@ -11,11 +11,11 @@ namespace ApowoGames.Resources
         #region Load
 
         // example:
-        // SpriteSheetResource ss = await RemoteResourceManager.Load(SpriteSheetResource.BuildRequest(uri)) as SpriteSheetResource;
-        public static async Task<Resource> Load(Request request)
+        // SpriteSheetResource ss = await RemoteResourceManager.Load<SpriteSheetResource>(SpriteSheetResource.BuildRequest(uri));
+        public static async Task<T> Load<T>(Request request) where T : Resource
         {
             var responses = await LoadFiles(request);
-            return request.GenerateResource(responses);
+            return request.GenerateResource(responses) as T;
         }
         
         private static async Task<ResponseFile[]> LoadFiles(Request request)
