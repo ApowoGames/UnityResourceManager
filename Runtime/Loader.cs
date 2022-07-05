@@ -282,6 +282,7 @@ namespace ApowoGames.Resources
             }
         }
 
+#if UNITY_EDITOR
         static string GetEditorAssetPath()
         {
             string re = Path.Combine(Application.dataPath, "../TempStreamingAssets/" + BuildTargetFolderName());
@@ -307,6 +308,7 @@ namespace ApowoGames.Resources
                     return "unkown";
             }
         }
+#endif
 
         #endregion
     }
