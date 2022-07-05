@@ -7,11 +7,16 @@ namespace ApowoGames.Resources
 
         public ImageRequest(string uri)
         {
+            if (!uri.EndsWith(".png"))
+            {
+                uri += ".png";
+            }
+            
             UriAndMimeTypes = new[]
             {
                 new UriAndMimeType()
                 {
-                    Uri = uri + ".png",
+                    Uri = uri,
                     MimeType = MimeType.Image
                 }
             };
