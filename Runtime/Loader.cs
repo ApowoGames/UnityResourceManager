@@ -114,7 +114,7 @@ namespace ApowoGames.Resources
         private async Task LoadFromCache()
         {
             string cachePath = Path.Combine(CacheRoot, CacheFileName);
-            byte[] bytes = File.ReadAllBytes(cachePath);
+            byte[] bytes = await File.ReadAllBytesAsync(cachePath);
             if (MimeType == MimeType.Image)
             {
                 ResponseFile = new ImageResponseFile(bytes);
@@ -220,10 +220,10 @@ namespace ApowoGames.Resources
             {
                 // save to cache
                 var cachePath = Path.Combine(CacheRoot, CacheFileName);
-                FileStream cacheFS = new FileStream(cachePath, FileMode.Create, FileAccess.ReadWrite);
-                cacheFS.Write(data, 0, data.Length);
-                cacheFS.Close();
-                cacheFS.Dispose();
+                FileStream cacheFs = new FileStream(cachePath, FileMode.Create, FileAccess.ReadWrite);
+                cacheFs.Write(data, 0, data.Length);
+                cacheFs.Close();
+                cacheFs.Dispose();
             }
         }
         

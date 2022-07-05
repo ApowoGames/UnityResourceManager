@@ -4,7 +4,7 @@ namespace ApowoGames.Resources
     {
         public override MimeType MimeType => MimeType.ArrayBuffer;
 
-        public byte[] Data => _data;
+        public new byte[] Data => _data;
         
         private byte[] _data;
 

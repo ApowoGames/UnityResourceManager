@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using ApowoGames.Resources.External;
-using UnityEngine;
 
 namespace ApowoGames.Resources
 {
@@ -12,7 +11,7 @@ namespace ApowoGames.Resources
         #region Load
 
         // example:
-        // SpriteSheetResource ss = await com.apowo.games.remote.resources.Load(SpriteSheetResource.BuildRequest(uri)) as SpriteSheetResource;
+        // SpriteSheetResource ss = await RemoteResourceManager.Load(SpriteSheetResource.BuildRequest(uri)) as SpriteSheetResource;
         public static async Task<Resource> Load(Request request)
         {
             var responses = await LoadFiles(request);
@@ -89,7 +88,7 @@ namespace ApowoGames.Resources
 
     public abstract class ResponseFile
     {
-        public object Data { get; }
+        public object Data { get; } = null;
         public string Uri { get; private set; }
         public abstract MimeType MimeType { get; }
         public string Suffix { get; private set; }

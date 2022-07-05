@@ -1,5 +1,5 @@
 {
-    "name": "Remote.Resource.Manager",
+    "name": "Remote.Resources",
     "rootNamespace": "",
     "references": [],
     "includePlatforms": [],

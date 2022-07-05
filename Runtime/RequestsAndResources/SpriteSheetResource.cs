@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using UnityEngine;
 
 namespace ApowoGames.Resources
@@ -36,7 +35,7 @@ namespace ApowoGames.Resources
 
             Texture2D = imageResponseFile.Data;
             var jsonStr = jsonResponseFile.Data;
-            var texWidth = Texture2D.width;
+            // var texWidth = Texture2D.width;
             var texHeight = Texture2D.height;
             var jsonResult = SpriteSheetJson.CreateFromJson(jsonStr);
             if (jsonResult?.frames == null)
@@ -48,13 +47,13 @@ namespace ApowoGames.Resources
             Sprites = new Dictionary<string, Sprite>();
             foreach (var f in jsonResult.frames)
             {
-                Sprite sprite = Sprite.Create(Texture2D, SpriteSheetRectToUnitySpriteEditorRect(f.frame, texWidth, texHeight), new Vector2(0f, 1f));
+                Sprite sprite = Sprite.Create(Texture2D, SpriteSheetRectToUnitySpriteEditorRect(f.frame, texHeight), new Vector2(0f, 1f));
                 sprite.name = f.filename;
                 Sprites[sprite.name] = sprite;
             }
         }
         
-        private static Rect SpriteSheetRectToUnitySpriteEditorRect(SpriteSheetFrameRect spriteSheetFrameRect, int texWidth, int texHeight)
+        private static Rect SpriteSheetRectToUnitySpriteEditorRect(SpriteSheetFrameRect spriteSheetFrameRect, int texHeight)
         {
             return new Rect(
                 spriteSheetFrameRect.x,
@@ -65,9 +64,9 @@ namespace ApowoGames.Resources
     }
     
     [Serializable]
-    internal class SpriteSheetJson
+    public class SpriteSheetJson
     {
-        internal SpriteSheetFrame[] frames;
+        public SpriteSheetFrame[] frames;
 
         public static SpriteSheetJson CreateFromJson(string jsonString)
         {
@@ -101,13 +100,13 @@ namespace ApowoGames.Resources
     }
 
     [Serializable]
-    internal class SpriteSheetFrame
+    public class SpriteSheetFrame
     {
         public string filename;
         public SpriteSheetFrameRect frame;
     }
     [Serializable]
-    internal class SpriteSheetFrameRect
+    public class SpriteSheetFrameRect
     {
         public int x;
         public int y;

@@ -6,7 +6,7 @@ namespace ApowoGames.Resources
     {
         public override MimeType MimeType => MimeType.AssetBundle;
 
-        public AssetBundle Data => _data;
+        public new AssetBundle Data => _data;
         
         private AssetBundle _data;
 

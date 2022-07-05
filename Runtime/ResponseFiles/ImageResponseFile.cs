@@ -6,7 +6,7 @@ namespace ApowoGames.Resources
     {
         public override MimeType MimeType => MimeType.Image;
 
-        public Texture2D Data => _data;
+        public new Texture2D Data => _data;
         
         private Texture2D _data;
 
@@ -17,7 +17,7 @@ namespace ApowoGames.Resources
 
         public ImageResponseFile(byte[] bytes)
         {
-            _data = Texture2D.whiteTexture;
+            _data = new Texture2D(2, 2);
             _data.LoadImage(bytes);
         }
         

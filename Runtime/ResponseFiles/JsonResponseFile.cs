@@ -4,7 +4,7 @@ namespace ApowoGames.Resources
     {
         public override MimeType MimeType => MimeType.Json;
 
-        public string Data => _data;
+        public new string Data => _data;
         
         private string _data;
 
