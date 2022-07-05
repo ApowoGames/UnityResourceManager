@@ -76,6 +76,7 @@ namespace ApowoGames.Resources
         private bool CheckInCache()
         {
             string cachePath = Path.Combine(CacheRoot, CacheFileName);
+            Debug.Log("RRM CheckInCache: " + cachePath);
             if (File.Exists(cachePath))
             {
                 return true;
@@ -114,6 +115,9 @@ namespace ApowoGames.Resources
         private async Task LoadFromCache()
         {
             string cachePath = Path.Combine(CacheRoot, CacheFileName);
+            
+            Debug.Log("RRM LoadFromCache: " + cachePath);
+            
             byte[] bytes = await File.ReadAllBytesAsync(cachePath);
             if (MimeType == MimeType.Image)
             {
@@ -140,6 +144,8 @@ namespace ApowoGames.Resources
         // TODO: 封装
         private async Task LoadFromNetwork()
         {
+            Debug.Log("RRM LoadFromNetwork: " + Uri);
+            
             byte[] data = new byte[0];
             if (MimeType == MimeType.Image)
             {
