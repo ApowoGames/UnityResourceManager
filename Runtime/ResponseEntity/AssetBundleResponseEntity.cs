@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ApowoGames.Resources
 {
-    public class AssetBundleResponseFile : ResponseFile
+    public class AssetBundleResponseEntity : ResponseEntity
     {
         public override MimeType MimeType => MimeType.AssetBundle;
 
@@ -10,12 +10,12 @@ namespace ApowoGames.Resources
         
         private AssetBundle _data;
 
-        public AssetBundleResponseFile(AssetBundle data)
+        public AssetBundleResponseEntity(AssetBundle data)
         {
             _data = data;
         }
 
-        public AssetBundleResponseFile(byte[] byts)
+        public AssetBundleResponseEntity(byte[] byts)
         {
             _data = AssetBundle.LoadFromMemory(byts);
         }

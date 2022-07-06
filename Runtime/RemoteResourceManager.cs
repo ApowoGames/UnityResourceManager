@@ -18,9 +18,9 @@ namespace ApowoGames.Resources
             return request.GenerateResource(responses) as T;
         }
         
-        private static async Task<ResponseFile[]> LoadFiles(Request request)
+        private static async Task<ResponseEntity[]> LoadFiles(Request request)
         {
-            var tasks = new List<Task<ResponseFile>>();
+            var tasks = new List<Task<ResponseEntity>>();
             for (int i = 0; i < request.UriAndMimeTypes.Length; i++)
             {
                 var uriAndMimeType = request.UriAndMimeTypes[i];
@@ -31,7 +31,7 @@ namespace ApowoGames.Resources
             return responses;
         }
 
-        private static async Task<ResponseFile> PerLoadFile(string uri, MimeType mimeType, CachePolicy cachePolicy, UnloadPolicy unloadPolicy)
+        private static async Task<ResponseEntity> PerLoadFile(string uri, MimeType mimeType, CachePolicy cachePolicy, UnloadPolicy unloadPolicy)
         {
             if (!_loaders.ContainsKey(uri))
             {
@@ -40,7 +40,7 @@ namespace ApowoGames.Resources
             }
 
             await _loaders[uri].Load();
-            return _loaders[uri].ResponseFile;
+            return _loaders[uri].ResponseEntity;
         }
 
         #endregion
@@ -63,9 +63,9 @@ namespace ApowoGames.Resources
 
     public abstract class Resource
     {
-        public ResponseFile[] Responses;
+        public ResponseEntity[] Responses;
         
-        protected Resource(ResponseFile[] responseFiles)
+        protected Resource(ResponseEntity[] responseFiles)
         {
             Responses = responseFiles;
         }
@@ -77,7 +77,7 @@ namespace ApowoGames.Resources
         public CachePolicy CachePolicy { get; set; }
         public UnloadPolicy UnloadPolicy { get; set; }
         
-        public abstract Resource GenerateResource(ResponseFile[] responses);
+        public abstract Resource GenerateResource(ResponseEntity[] responses);
     }
     
     public class UriAndMimeType
@@ -86,7 +86,7 @@ namespace ApowoGames.Resources
         public MimeType MimeType { get; set; }
     }
 
-    public abstract class ResponseFile
+    public abstract class ResponseEntity
     {
         public object Data { get; } = null;
         public string Uri { get; private set; }

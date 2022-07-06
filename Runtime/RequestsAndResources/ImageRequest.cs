@@ -24,7 +24,7 @@ namespace ApowoGames.Resources
             UnloadPolicy = UnloadPolicy.从不;
         }
 
-        public override Resource GenerateResource(ResponseFile[] responses)
+        public override Resource GenerateResource(ResponseEntity[] responses)
         {
             return new ImageResource(responses);
         }

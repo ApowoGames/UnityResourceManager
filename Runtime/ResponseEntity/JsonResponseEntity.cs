@@ -1,6 +1,6 @@
 namespace ApowoGames.Resources
 {
-    public class JsonResponseFile : ResponseFile
+    public class JsonResponseEntity : ResponseEntity
     {
         public override MimeType MimeType => MimeType.Json;
 
@@ -8,12 +8,12 @@ namespace ApowoGames.Resources
         
         private string _data;
 
-        public JsonResponseFile(string data)
+        public JsonResponseEntity(string data)
         {
             _data = data;
         }
 
-        public JsonResponseFile(byte[] bytes)
+        public JsonResponseEntity(byte[] bytes)
         {
             _data = System.Text.Encoding.UTF8.GetString(bytes);
         }

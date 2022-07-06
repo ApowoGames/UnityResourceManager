@@ -18,27 +18,27 @@ namespace ApowoGames.Resources
             return new SpriteSheetRequest(imgUri, jsonUri);
         }
         
-        public SpriteSheetResource(ResponseFile[] responses) : base(responses)
+        public SpriteSheetResource(ResponseEntity[] responses) : base(responses)
         {
-            ImageResponseFile imageResponseFile = null;
-            JsonResponseFile jsonResponseFile = null;
+            ImageResponseEntity imageResponseEntity = null;
+            JsonResponseEntity jsonResponseEntity = null;
             foreach (var response in responses)
             {
                 if (response.MimeType == MimeType.Image)
                 {
-                    imageResponseFile = response as ImageResponseFile;
+                    imageResponseEntity = response as ImageResponseEntity;
                 }
 
                 if (response.MimeType == MimeType.Json)
                 {
-                    jsonResponseFile = response as JsonResponseFile;
+                    jsonResponseEntity = response as JsonResponseEntity;
                 }
             }
             
-            if (imageResponseFile?.Data == null || jsonResponseFile?.Data == null) return;
+            if (imageResponseEntity?.Data == null || jsonResponseEntity?.Data == null) return;
 
-            Texture2D = imageResponseFile.Data;
-            var jsonStr = jsonResponseFile.Data;
+            Texture2D = imageResponseEntity.Data;
+            var jsonStr = jsonResponseEntity.Data;
             // var texWidth = Texture2D.width;
             var texHeight = Texture2D.height;
             var jsonResult = SpriteSheetJson.CreateFromJson(jsonStr);

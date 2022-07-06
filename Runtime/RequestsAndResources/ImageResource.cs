@@ -11,19 +11,19 @@ namespace ApowoGames.Resources
             return new ImageRequest(uri);
         }
         
-        public ImageResource(ResponseFile[] responses) : base(responses)
+        public ImageResource(ResponseEntity[] responses) : base(responses)
         {
-            ImageResponseFile imageResponseFile = null;
+            ImageResponseEntity imageResponseEntity = null;
             foreach (var response in responses)
             {
                 if (response.MimeType == MimeType.Image)
                 {
-                    imageResponseFile = response as ImageResponseFile;
+                    imageResponseEntity = response as ImageResponseEntity;
                 }
             }
-            if (imageResponseFile?.Data == null) return;
+            if (imageResponseEntity?.Data == null) return;
 
-            Texture2D = imageResponseFile.Data;
+            Texture2D = imageResponseEntity.Data;
         }
     }
 }

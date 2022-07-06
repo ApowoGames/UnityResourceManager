@@ -9,7 +9,7 @@ namespace ApowoGames.Resources
 {
     public class Loader
     {
-        public ResponseFile ResponseFile;
+        public ResponseEntity ResponseEntity;
 
         public string Uri;
         public MimeType MimeType;
@@ -45,14 +45,14 @@ namespace ApowoGames.Resources
 
         public async Task Load()
         {
-            if (ResponseFile != null)
+            if (ResponseEntity != null)
             {
                 return;
             }
 
             if (_started)
             {
-                while (ResponseFile == null)
+                while (ResponseEntity == null)
                 {
                     await Task.Yield();
                 }
@@ -76,7 +76,7 @@ namespace ApowoGames.Resources
         private bool CheckInCache()
         {
             string cachePath = Path.Combine(CacheRoot, CacheFileName);
-            Debug.Log("RRM CheckInCache: " + cachePath);
+            // Debug.Log("RRM CheckInCache: " + cachePath);
             if (File.Exists(cachePath))
             {
                 return true;
@@ -121,19 +121,19 @@ namespace ApowoGames.Resources
             byte[] bytes = await File.ReadAllBytesAsync(cachePath);
             if (MimeType == MimeType.Image)
             {
-                ResponseFile = new ImageResponseFile(bytes);
+                ResponseEntity = new ImageResponseEntity(bytes);
             }
             else if (MimeType == MimeType.Json)
             {
-                ResponseFile = new JsonResponseFile(bytes);
+                ResponseEntity = new JsonResponseEntity(bytes);
             }
             else if (MimeType == MimeType.ArrayBuffer)
             {
-                ResponseFile = new ArrayBufferResponseFile(bytes);
+                ResponseEntity = new ArrayBufferResponseEntity(bytes);
             }
             else if (MimeType == MimeType.AssetBundle)
             {
-                ResponseFile = new AssetBundleResponseFile(bytes);
+                ResponseEntity = new AssetBundleResponseEntity(bytes);
             }
             else
             {
@@ -162,7 +162,7 @@ namespace ApowoGames.Resources
 
                 data = request.downloadHandler.data;
                 Texture2D tex = ((DownloadHandlerTexture)request.downloadHandler).texture;
-                ResponseFile = new ImageResponseFile(tex);
+                ResponseEntity = new ImageResponseEntity(tex);
             }
             else if (MimeType == MimeType.Json)
             {
@@ -180,7 +180,7 @@ namespace ApowoGames.Resources
 
                 data = request.downloadHandler.data;
                 var jsonStr = request.downloadHandler.text;
-                ResponseFile = new JsonResponseFile(jsonStr);
+                ResponseEntity = new JsonResponseEntity(jsonStr);
             }
             else if (MimeType == MimeType.ArrayBuffer)
             {
@@ -198,11 +198,11 @@ namespace ApowoGames.Resources
 
                 data = request.downloadHandler.data;
                 byte[] pi = request.downloadHandler.data;
-                ResponseFile = new ArrayBufferResponseFile(pi);
+                ResponseEntity = new ArrayBufferResponseEntity(pi);
             }
             else if (MimeType == MimeType.AssetBundle)
             {
-                UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(Uri);
+                UnityWebRequest request = UnityWebRequest.Get(Uri);
                 var operation = request.SendWebRequest();
                 while (!operation.isDone)
                     await Task.Yield();
@@ -214,8 +214,7 @@ namespace ApowoGames.Resources
                 }
 
                 data = request.downloadHandler.data;
-                AssetBundle ab = ((DownloadHandlerAssetBundle)request.downloadHandler).assetBundle;
-                ResponseFile = new AssetBundleResponseFile(ab);
+                ResponseEntity = new AssetBundleResponseEntity(data);
             }
             else
             {
@@ -235,10 +234,10 @@ namespace ApowoGames.Resources
         
         public void Unload()
         {
-            if (ResponseFile != null)
+            if (ResponseEntity != null)
             {
-                ResponseFile.Dispose();
-                ResponseFile = null;
+                ResponseEntity.Dispose();
+                ResponseEntity = null;
             }
         }
 
@@ -259,15 +258,15 @@ namespace ApowoGames.Resources
 #if UNITY_EDITOR
                 GetEditorAssetPath();
 #elif UNITY_STANDALONE_WIN
-                Application.dataPath + "/StreamingAssets";
+                Application.dataPath + "/StreamingAssets/remote";
 #elif UNITY_STANDALONE_OSX
-		        Application.dataPath + "/StreamingAssets";
+		        Application.dataPath + "/StreamingAssets/remote";
 #elif UNITY_ANDROID
 	            Application.persistentDataPath;
 #elif UNITY_IPHONE
 	            Application.persistentDataPath;
 #elif UNITY_WEBGL
-	            Application.dataPath + "/StreamingAssets";
+	            Application.dataPath + "/StreamingAssets/remote";
 #else
                         string.Empty;
 #endif
@@ -285,7 +284,7 @@ namespace ApowoGames.Resources
 #if UNITY_EDITOR
         static string GetEditorAssetPath()
         {
-            string re = Path.Combine(Application.dataPath, "../TempStreamingAssets/" + BuildTargetFolderName());
+            string re = Path.Combine(Application.dataPath, "../TempStreamingAssets/" + BuildTargetFolderName() + "/remote");
             return re;
         }
 

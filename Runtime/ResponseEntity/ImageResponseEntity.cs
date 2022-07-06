@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ApowoGames.Resources
 {
-    public class ImageResponseFile : ResponseFile
+    public class ImageResponseEntity : ResponseEntity
     {
         public override MimeType MimeType => MimeType.Image;
 
@@ -10,12 +10,12 @@ namespace ApowoGames.Resources
         
         private Texture2D _data;
 
-        public ImageResponseFile(Texture2D data)
+        public ImageResponseEntity(Texture2D data)
         {
             _data = data;
         }
 
-        public ImageResponseFile(byte[] bytes)
+        public ImageResponseEntity(byte[] bytes)
         {
             _data = new Texture2D(2, 2);
             _data.LoadImage(bytes);
