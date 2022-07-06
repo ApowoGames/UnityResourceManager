@@ -258,15 +258,15 @@ namespace ApowoGames.Resources
 #if UNITY_EDITOR
                 GetEditorAssetPath();
 #elif UNITY_STANDALONE_WIN
-                Application.dataPath + "/StreamingAssets/remote";
+                Application.dataPath + "/StreamingAssets/Cache";
 #elif UNITY_STANDALONE_OSX
-		        Application.dataPath + "/StreamingAssets/remote";
+		        Application.dataPath + "/StreamingAssets/Cache";
 #elif UNITY_ANDROID
 	            Application.persistentDataPath;
 #elif UNITY_IPHONE
 	            Application.persistentDataPath;
 #elif UNITY_WEBGL
-	            Application.dataPath + "/StreamingAssets/remote";
+	            Application.dataPath + "/StreamingAssets/Cache";
 #else
                         string.Empty;
 #endif
@@ -284,7 +284,7 @@ namespace ApowoGames.Resources
 #if UNITY_EDITOR
         static string GetEditorAssetPath()
         {
-            string re = Path.Combine(Application.dataPath, "../TempStreamingAssets/" + BuildTargetFolderName() + "/remote");
+            string re = Path.Combine(Application.dataPath, "../TempStreamingAssets/" + BuildTargetFolderName() + "/Cache");
             return re;
         }
 
