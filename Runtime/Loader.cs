@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using ApowoGames.Resources.External;
@@ -76,39 +77,11 @@ namespace ApowoGames.Resources
         private bool CheckInCache()
         {
             string cachePath = Path.Combine(CacheRoot, CacheFileName);
-            // Debug.Log("RRM CheckInCache: " + cachePath);
-            if (File.Exists(cachePath))
+            Debug.Log("RRM CheckInCache: " + cachePath);
+            if (BetterStreamingAssets.FileExists(cachePath))
             {
                 return true;
             }
-
-#if UNITY_ANDROID
-            using (AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-            {
-                using (AndroidJavaObject jo = jc.GetStatic<AndroidJavaObject>("currentActivity"))
-                {
-                    //Debugger.Log(()=>"CacheFileName---->>" + CacheFileName,5);
-                    byte[] re = null;
-                    try
-                    {
-                        re = jo.Call<byte[]>("GetFileBytes", CacheFileName);
-                   
-                        if (re.Length==1)
-                        {
-                            Debugger.Log(() => ">>>>>>> ###" + CacheFileName + "读取 失败 length is 1. function undefined? ",5);
-                            return false;
-                        }
-                    }
-                    catch (System.Exception e)
-                    {
-                        Debugger.Log(() => ">>>>>>> ###" + CacheFileName + "读取 失败 " + e.Message,5);
-                        return false;
-                    }
-                    //Debugger.Log(() => "re.Length---->>" + re.Length,5);
-                    return true;
-                }
-            }
-#endif
             return false;
         }
 
@@ -118,7 +91,7 @@ namespace ApowoGames.Resources
             
             Debug.Log("RRM LoadFromCache: " + cachePath);
             
-            byte[] bytes = await File.ReadAllBytesAsync(cachePath);
+            byte[] bytes = BetterStreamingAssets.ReadAllBytes(cachePath);
             if (MimeType == MimeType.Image)
             {
                 ResponseEntity = new ImageResponseEntity(bytes);
@@ -224,11 +197,20 @@ namespace ApowoGames.Resources
             if (data.Length > 0 && CachePolicy == CachePolicy.永远)
             {
                 // save to cache
-                var cachePath = Path.Combine(CacheRoot, CacheFileName);
-                FileStream cacheFs = new FileStream(cachePath, FileMode.Create, FileAccess.ReadWrite);
-                cacheFs.Write(data, 0, data.Length);
-                cacheFs.Close();
-                cacheFs.Dispose();
+                var cachePath = Path.Combine(BetterStreamingAssets.Root, Path.Combine(CacheRoot, CacheFileName));
+
+                try
+                {
+                    FileStream cacheFs = new FileStream(cachePath, FileMode.Create, FileAccess.ReadWrite);
+                    cacheFs.Write(data, 0, data.Length);
+                    cacheFs.Close();
+                    cacheFs.Dispose();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
         }
         
@@ -248,32 +230,32 @@ namespace ApowoGames.Resources
         /// <summary>
         /// 可写更新目录
         /// </summary>
-        private static string CacheRoot
+        internal static string CacheRoot
         {
             get
             {
                 if (_cacheRoot == null)
                 {
-                    _cacheRoot =
-#if UNITY_EDITOR
-                GetEditorAssetPath();
-#elif UNITY_STANDALONE_WIN
-                Application.dataPath + "/StreamingAssets/Cache";
-#elif UNITY_STANDALONE_OSX
-		        Application.dataPath + "/StreamingAssets/Cache";
-#elif UNITY_ANDROID
-	            Application.persistentDataPath;
-#elif UNITY_IPHONE
-	            Application.persistentDataPath;
-#elif UNITY_WEBGL
-	            Application.dataPath + "/StreamingAssets/Cache";
-#else
-                        string.Empty;
-#endif
+                    _cacheRoot = "cache";
+// #if UNITY_EDITOR
+//                 GetEditorAssetPath();
+// #elif UNITY_STANDALONE_WIN
+//                 Application.dataPath + "/StreamingAssets/Cache";
+// #elif UNITY_STANDALONE_OSX
+// 		        Application.dataPath + "/StreamingAssets/Cache";
+// #elif UNITY_ANDROID
+// 	            Application.persistentDataPath;
+// #elif UNITY_IPHONE
+// 	            Application.persistentDataPath;
+// #elif UNITY_WEBGL
+// 	            Application.dataPath + "/StreamingAssets/Cache";
+// #else
+//                         string.Empty;
+// #endif
                     
-                    if (!Directory.Exists(_cacheRoot))
+                    if (!BetterStreamingAssets.DirectoryExists(_cacheRoot))
                     {
-                        Directory.CreateDirectory(_cacheRoot);
+                        Directory.CreateDirectory(Path.Combine(BetterStreamingAssets.Root, _cacheRoot));
                     }
                 }
 
@@ -281,33 +263,34 @@ namespace ApowoGames.Resources
             }
         }
 
-#if UNITY_EDITOR
-        static string GetEditorAssetPath()
-        {
-            string re = Path.Combine(Application.dataPath, "../TempStreamingAssets/" + BuildTargetFolderName() + "/Cache");
-            return re;
-        }
-
-        static string BuildTargetFolderName()
-        {
-            switch (EditorUserBuildSettings.activeBuildTarget)
-            {
-                case BuildTarget.Android:
-                    return "Android";
-                case BuildTarget.iOS:
-                    return "IOS";
-                case BuildTarget.StandaloneWindows:
-                case BuildTarget.StandaloneWindows64:
-                    return "Windows";
-                case BuildTarget.StandaloneOSX:
-                    return "MacOS";
-                case BuildTarget.WebGL:
-                    return "WebGL";
-                default:
-                    return "unkown";
-            }
-        }
-#endif
+// #if UNITY_EDITOR
+//         static string GetEditorAssetPath()
+//         {
+//             
+//             string re = Path.Combine(Application.dataPath, "../TempStreamingAssets/" + BuildTargetFolderName() + "/Cache");
+//             return re;
+//         }
+//
+//         static string BuildTargetFolderName()
+//         {
+//             switch (EditorUserBuildSettings.activeBuildTarget)
+//             {
+//                 case BuildTarget.Android:
+//                     return "Android";
+//                 case BuildTarget.iOS:
+//                     return "IOS";
+//                 case BuildTarget.StandaloneWindows:
+//                 case BuildTarget.StandaloneWindows64:
+//                     return "Windows";
+//                 case BuildTarget.StandaloneOSX:
+//                     return "MacOS";
+//                 case BuildTarget.WebGL:
+//                     return "WebGL";
+//                 default:
+//                     return "unkown";
+//             }
+//         }
+// #endif
 
         #endregion
     }

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using ApowoGames.Resources.External;
+using UnityEngine;
 
 namespace ApowoGames.Resources
 {
@@ -8,12 +10,20 @@ namespace ApowoGames.Resources
     {   
         private static Dictionary<string, Loader> _loaders = new Dictionary<string, Loader>();
 
+        private static bool _isInitialized = false;
+        
         #region Load
 
         // example:
         // SpriteSheetResource ss = await RemoteResourceManager.Load<SpriteSheetResource>(SpriteSheetResource.BuildRequest(uri));
         public static async Task<T> Load<T>(Request request) where T : Resource
         {
+            if (!_isInitialized)
+            {
+                _isInitialized = true;
+                BetterStreamingAssets.Initialize();
+            }
+            
             var responses = await LoadFiles(request);
             return request.GenerateResource(responses) as T;
         }
@@ -54,7 +64,21 @@ namespace ApowoGames.Resources
                 if (_loaders.ContainsKey(responseFile.Uri))
                 {
                     _loaders[responseFile.Uri].Unload();
+                    _loaders.Remove(responseFile.Uri);
                 }
+            }
+        }
+
+        #endregion
+
+        #region ClearCache
+
+        public static void ClearCache()
+        {
+            Debug.Log("RRM ClearCache");
+            if (BetterStreamingAssets.DirectoryExists(Loader.CacheRoot))
+            {
+                Directory.Delete(Path.Combine(BetterStreamingAssets.Root, Loader.CacheRoot), true);
             }
         }
 

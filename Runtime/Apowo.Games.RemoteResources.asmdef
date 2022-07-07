@@ -1,7 +1,9 @@
 {
     "name": "Remote.Resources",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:5e90fee04fdf7164fa71eeef34c6a431"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
