@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ApowoGames.Resources.External;
@@ -7,13 +8,15 @@ using UnityEngine;
 namespace ApowoGames.Resources
 {
     public static class RemoteResourceManager
-    {   
+    {
         private static Dictionary<string, Loader> _loaders = new Dictionary<string, Loader>();
 
         private static bool _isInitialized = false;
-        
+
         #region Load
 
+        // load resources
+        // if the resource is not found, it will return null
         // example:
         // SpriteSheetResource ss = await RemoteResourceManager.Load<SpriteSheetResource>(SpriteSheetResource.BuildRequest(uri));
         public static async Task<T> Load<T>(Request request) where T : Resource
@@ -23,25 +26,34 @@ namespace ApowoGames.Resources
                 _isInitialized = true;
                 BetterStreamingAssets.Initialize();
             }
-            
-            var responses = await LoadFiles(request);
-            return request.GenerateResource(responses) as T;
+
+            try
+            {
+                var responses = await LoadFiles(request);
+                return request.GenerateResource(responses) as T;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                return null;
+            }
         }
-        
+
         private static async Task<ResponseEntity[]> LoadFiles(Request request)
         {
             var tasks = new List<Task<ResponseEntity>>();
             for (int i = 0; i < request.UriAndMimeTypes.Length; i++)
             {
                 var uriAndMimeType = request.UriAndMimeTypes[i];
-                tasks.Add(PerLoadFile(uriAndMimeType.Uri, uriAndMimeType.MimeType, request.CachePolicy, request.UnloadPolicy));
+                tasks.Add(PerLoadFile(uriAndMimeType.Uri, uriAndMimeType.MimeType, request.CachePolicy,
+                    request.UnloadPolicy));
             }
 
-            var responses = await Task.WhenAll(tasks);
-            return responses;
+            return await Task.WhenAll(tasks);
         }
 
-        private static async Task<ResponseEntity> PerLoadFile(string uri, MimeType mimeType, CachePolicy cachePolicy, UnloadPolicy unloadPolicy)
+        private static async Task<ResponseEntity> PerLoadFile(string uri, MimeType mimeType, CachePolicy cachePolicy,
+            UnloadPolicy unloadPolicy)
         {
             if (!_loaders.ContainsKey(uri))
             {
@@ -88,7 +100,7 @@ namespace ApowoGames.Resources
     public abstract class Resource
     {
         public ResponseEntity[] Responses;
-        
+
         protected Resource(ResponseEntity[] responseFiles)
         {
             Responses = responseFiles;
@@ -100,10 +112,10 @@ namespace ApowoGames.Resources
         public UriAndMimeType[] UriAndMimeTypes { get; set; }
         public CachePolicy CachePolicy { get; set; }
         public UnloadPolicy UnloadPolicy { get; set; }
-        
+
         public abstract Resource GenerateResource(ResponseEntity[] responses);
     }
-    
+
     public class UriAndMimeType
     {
         public string Uri { get; set; }
@@ -118,10 +130,12 @@ namespace ApowoGames.Resources
         public string Suffix { get; private set; }
         public abstract void Dispose();
     }
-    
+
     public class MimeType : StringEnum
-    { 
-        private MimeType(string value) : base(value) {}
+    {
+        private MimeType(string value) : base(value)
+        {
+        }
 
         public static readonly MimeType AssetBundle = new MimeType("custom/assetbundle");
         public static readonly MimeType Image = new MimeType("image/png");

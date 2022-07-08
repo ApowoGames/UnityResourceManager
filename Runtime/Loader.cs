@@ -57,6 +57,7 @@ namespace ApowoGames.Resources
                 {
                     await Task.Yield();
                 }
+
                 return;
             }
 
@@ -77,20 +78,21 @@ namespace ApowoGames.Resources
         private bool CheckInCache()
         {
             string cachePath = Path.Combine(CacheRoot, CacheFileName);
-            Debug.Log("RRM CheckInCache: " + cachePath);
+            // Debug.Log("RRM CheckInCache: " + cachePath);
             if (BetterStreamingAssets.FileExists(cachePath))
             {
                 return true;
             }
+
             return false;
         }
 
         private async Task LoadFromCache()
         {
             string cachePath = Path.Combine(CacheRoot, CacheFileName);
-            
-            Debug.Log("RRM LoadFromCache: " + cachePath);
-            
+
+            // Debug.Log("RRM LoadFromCache: " + cachePath);
+
             byte[] bytes = BetterStreamingAssets.ReadAllBytes(cachePath);
             if (MimeType == MimeType.Image)
             {
@@ -110,15 +112,15 @@ namespace ApowoGames.Resources
             }
             else
             {
-                Debug.LogError("MimeType error, check url: " + (Uri));
+                throw new Exception("MimeType error, check url: " + (Uri));
             }
         }
 
         // TODO: 封装
         private async Task LoadFromNetwork()
         {
-            Debug.Log("RRM LoadFromNetwork: " + Uri);
-            
+            // Debug.Log("RRM LoadFromNetwork: " + Uri);
+
             byte[] data = new byte[0];
             if (MimeType == MimeType.Image)
             {
@@ -129,8 +131,7 @@ namespace ApowoGames.Resources
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError("404 Load Texture error, check url: " + (Uri));
-                    return;
+                    throw new Exception("404 Load Texture error, check url: " + (Uri));
                 }
 
                 data = request.downloadHandler.data;
@@ -147,8 +148,7 @@ namespace ApowoGames.Resources
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError("404 Load Json error, check url: " + (Uri));
-                    return;
+                    throw new Exception("404 Load Json error, check url: " + (Uri));
                 }
 
                 data = request.downloadHandler.data;
@@ -165,8 +165,7 @@ namespace ApowoGames.Resources
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError("404 Load ArrayBuffer error, check url: " + Uri);
-                    return;
+                    throw new Exception("404 Load ArrayBuffer error, check url: " + (Uri));
                 }
 
                 data = request.downloadHandler.data;
@@ -182,8 +181,7 @@ namespace ApowoGames.Resources
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError("404 Load AssetBundle error, check url: " + (Uri));
-                    return;
+                    throw new Exception("404 Load AssetBundle error, check url: " + (Uri));
                 }
 
                 data = request.downloadHandler.data;
@@ -191,7 +189,7 @@ namespace ApowoGames.Resources
             }
             else
             {
-                Debug.LogError("MimeType error, check url: " + (Uri));
+                throw new Exception("MimeType error, check url: " + (Uri));
             }
 
             if (data.Length > 0 && CachePolicy == CachePolicy.永远)
@@ -213,7 +211,7 @@ namespace ApowoGames.Resources
                 }
             }
         }
-        
+
         public void Unload()
         {
             if (ResponseEntity != null)
@@ -252,7 +250,7 @@ namespace ApowoGames.Resources
 // #else
 //                         string.Empty;
 // #endif
-                    
+
                     if (!BetterStreamingAssets.DirectoryExists(_cacheRoot))
                     {
                         Directory.CreateDirectory(Path.Combine(BetterStreamingAssets.Root, _cacheRoot));
