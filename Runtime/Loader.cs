@@ -63,16 +63,24 @@ namespace ApowoGames.Resources
 
             _started = true;
 
-            if (CheckInCache())
+            try
             {
-                await LoadFromCache();
-            }
-            else
-            {
-                await LoadFromNetwork();
-            }
+                if (CheckInCache())
+                {
+                    await LoadFromCache();
+                }
+                else
+                {
+                    await LoadFromNetwork();
+                }
 
-            _started = false;
+                _started = false;
+            }
+            catch (Exception e)
+            {
+                _started = false;
+                throw e;
+            }
         }
 
         private bool CheckInCache()
