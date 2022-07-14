@@ -11,8 +11,6 @@ namespace ApowoGames.Resources
     {
         private static Dictionary<string, Loader> _loaders = new Dictionary<string, Loader>();
 
-        private static bool _isInitialized = false;
-
         #region Load
 
         // load resources
@@ -21,12 +19,6 @@ namespace ApowoGames.Resources
         // SpriteSheetResource ss = await RemoteResourceManager.Load<SpriteSheetResource>(SpriteSheetResource.BuildRequest(uri));
         public static async Task<T> Load<T>(Request request) where T : Resource
         {
-            if (!_isInitialized)
-            {
-                _isInitialized = true;
-                BetterStreamingAssets.Initialize();
-            }
-
             try
             {
                 var responses = await LoadFiles(request);
@@ -37,6 +29,10 @@ namespace ApowoGames.Resources
                 Debug.LogError(e);
                 return null;
             }
+        }
+
+        public static void Initialize(string cacheRoot) {
+            Loader.CacheRoot = cacheRoot;
         }
 
         private static async Task<ResponseEntity[]> LoadFiles(Request request)
@@ -88,9 +84,9 @@ namespace ApowoGames.Resources
         public static void ClearCache()
         {
             Debug.Log("RRM ClearCache");
-            if (BetterStreamingAssets.DirectoryExists(Loader.CacheRoot))
+            if (Directory.Exists(Loader.CacheRoot))
             {
-                Directory.Delete(Path.Combine(BetterStreamingAssets.Root, Loader.CacheRoot), true);
+                Directory.Delete(Loader.CacheRoot, true);
             }
         }
 
