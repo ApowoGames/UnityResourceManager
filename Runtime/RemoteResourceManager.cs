@@ -123,7 +123,7 @@ namespace ApowoGames.Resources
         public object Data { get; } = null;
         public string Uri { get; private set; }
         public abstract MimeType MimeType { get; }
-        public string Suffix { get; private set; }
+        public string Suffix { get; }
         public abstract void Dispose();
     }
 
@@ -136,7 +136,7 @@ namespace ApowoGames.Resources
         public static readonly MimeType AssetBundle = new MimeType("custom/assetbundle");
         public static readonly MimeType Image = new MimeType("image/png");
         public static readonly MimeType Json = new MimeType("application/json");
-        public static readonly MimeType ArrayBuffer = new MimeType("application/arraybuffer");
+        public static readonly MimeType ArrayBuffer = new MimeType("application/octet-stream");
     }
 
     public enum CachePolicy

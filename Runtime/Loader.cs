@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ApowoGames.Resources.External;
 using UnityEditor;
@@ -28,6 +29,8 @@ namespace ApowoGames.Resources
                 if (string.IsNullOrEmpty(_cacheFileName))
                 {
                     _cacheFileName = MD5Helper.EncryptString(Uri);
+
+                    _cacheFileName += Path.GetExtension(Uri);
                 }
 
                 return _cacheFileName;
@@ -67,11 +70,14 @@ namespace ApowoGames.Resources
             {
                 if (CheckInCache())
                 {
-                    LoadFromCache();
+                    var path = Regex.Replace(Path.Combine(CacheRoot, CacheFileName), @"(http(s)?):\/\/", "");
+                    //var path = Path.Combine(CacheRoot, CacheFileName);
+                    await LoadFromNetwork("file://" + path);
                 }
                 else
                 {
-                    await LoadFromNetwork();
+                    var bytes = await LoadFromNetwork(Uri);
+                    SaveCache(bytes);
                 }
 
                 _started = false;
@@ -85,21 +91,14 @@ namespace ApowoGames.Resources
 
         private bool CheckInCache()
         {
-            string cachePath = Path.Combine(CacheRoot, CacheFileName);
-            // Debug.Log("RRM CheckInCache: " + cachePath);
-            if (File.Exists(cachePath))
-            {
-                return true;
-            }
-
-            return false;
+            return File.Exists(Path.Combine(CacheRoot, CacheFileName));
         }
 
-        private void LoadFromCache()
+        private void LoadFromCache(string url)
         {
             string cachePath = Path.Combine(CacheRoot, CacheFileName);
 
-            // Debug.Log("RRM LoadFromCache: " + cachePath);
+            //// Debug.Log("RRM LoadFromCache: " + cachePath);
 
             byte[] bytes = File.ReadAllBytes(cachePath);
             if (MimeType == MimeType.Image)
@@ -125,21 +124,20 @@ namespace ApowoGames.Resources
         }
 
         // TODO: 封装
-        private async Task LoadFromNetwork()
+        private async Task<byte[]> LoadFromNetwork(string url)
         {
-            // Debug.Log("RRM LoadFromNetwork: " + Uri);
-
-            byte[] data = new byte[0];
+            byte[] data;
             if (MimeType == MimeType.Image)
             {
-                UnityWebRequest request = UnityWebRequestTexture.GetTexture(Uri);
+                UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+                request.SetRequestHeader("Content-Type", "image/png");
                 var operation = request.SendWebRequest();
                 while (!operation.isDone)
                     await Task.Yield();
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    throw new Exception("404 Load Texture error, check url: " + (Uri));
+                    throw new Exception("404 Load Texture error, check url: " + (url));
                 }
 
                 data = request.downloadHandler.data;
@@ -148,7 +146,7 @@ namespace ApowoGames.Resources
             }
             else if (MimeType == MimeType.Json)
             {
-                UnityWebRequest request = UnityWebRequest.Get(Uri);
+                UnityWebRequest request = UnityWebRequest.Get(url);
                 request.SetRequestHeader("Content-Type", "application/json");
                 var operation = request.SendWebRequest();
                 while (!operation.isDone)
@@ -156,7 +154,7 @@ namespace ApowoGames.Resources
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    throw new Exception("404 Load Json error, check url: " + (Uri));
+                    throw new Exception("404 Load Json error, check url: " + (url));
                 }
 
                 data = request.downloadHandler.data;
@@ -165,15 +163,16 @@ namespace ApowoGames.Resources
             }
             else if (MimeType == MimeType.ArrayBuffer)
             {
-                UnityWebRequest request = UnityWebRequest.Get(Uri);
-                request.SetRequestHeader("Content-Type", "application/arraybuffer");
+                UnityWebRequest request = UnityWebRequest.Get(url);
+                request.SetRequestHeader("Content-Type", "application/octet-stream");
                 var operation = request.SendWebRequest();
                 while (!operation.isDone)
                     await Task.Yield();
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    throw new Exception("404 Load ArrayBuffer error, check url: " + (Uri));
+                    
+                    throw new Exception("404 Load ArrayBuffer error, check url: " + (url) + "downloadProgress: " + request.downloadProgress + "downloadedBytes:" + request.downloadedBytes + "--->>" + request.result.ToString());
                 }
 
                 data = request.downloadHandler.data;
@@ -182,14 +181,14 @@ namespace ApowoGames.Resources
             }
             else if (MimeType == MimeType.AssetBundle)
             {
-                UnityWebRequest request = UnityWebRequest.Get(Uri);
+                UnityWebRequest request = UnityWebRequest.Get(url);
                 var operation = request.SendWebRequest();
                 while (!operation.isDone)
                     await Task.Yield();
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    throw new Exception("404 Load AssetBundle error, check url: " + (Uri));
+                    throw new Exception("404 Load AssetBundle error, check url: " + (url));
                 }
 
                 data = request.downloadHandler.data;
@@ -197,10 +196,17 @@ namespace ApowoGames.Resources
             }
             else
             {
-                throw new Exception("MimeType error, check url: " + (Uri));
+                throw new Exception("MimeType error, check url: " + (url));
             }
 
-            if (data.Length > 0 && CachePolicy == CachePolicy.永远)
+            return data;
+
+           
+        }
+
+        private void SaveCache(byte[] data)
+        {
+            if (data != null && data.Length > 0 && CachePolicy == CachePolicy.永远)
             {
                 // save to cache
                 var cachePath = Path.Combine(CacheRoot, CacheFileName);
@@ -214,7 +220,7 @@ namespace ApowoGames.Resources
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    Console.WriteLine("SaveCache error: " + e);
                     throw;
                 }
             }
